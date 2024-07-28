@@ -133,6 +133,7 @@ import IconGithub from "~icons/auth/github"
 import IconGoogle from "~icons/auth/google"
 import IconMicrosoft from "~icons/auth/microsoft"
 import IconArrowLeft from "~icons/lucide/arrow-left"
+import IconOidc from "~icons/auth/oidc"
 
 import { useService } from "dioc/vue"
 import { LoginItemDef } from "~/platform/auth"
@@ -160,10 +161,12 @@ const signingInWithGoogle = ref(false)
 const signingInWithGitHub = ref(false)
 const signingInWithMicrosoft = ref(false)
 const signingInWithEmail = ref(false)
+const signingInWithOidc = ref(false)
 const mode = ref("sign-in")
 
 const tosLink = import.meta.env.VITE_APP_TOS_LINK
 const privacyPolicyLink = import.meta.env.VITE_APP_PRIVACY_POLICY_LINK
+const oidcButtonText = import.meta.env.VITE_OIDC_TEXT
 
 type AuthProviderItem = {
   id: string
@@ -330,6 +333,18 @@ const signInWithEmail = async () => {
     })
 }
 
+const signInWithOidc = async () => {
+  signingInWithOidc.value = true
+  try {
+    await platform.auth.signInUserWithOidc()
+  } catch (e) {
+    console.error(e)
+    toast.error(`${t("error.something_went_wrong")}`)
+  }
+  signingInWithOidc.value = false
+}
+
+
 const authProvidersAvailable: AuthProviderItem[] = [
   {
     id: "GITHUB",
@@ -368,6 +383,13 @@ const authProvidersAvailable: AuthProviderItem[] = [
       mode.value = "email"
     },
     isLoading: signingInWithEmail,
+  },
+  {
+    id: "OIDC",
+    icon: IconOidc,
+    label: oidcButtonText || t("auth.continue_with_oidc"),
+    action: signInWithOidc,
+    isLoading: signingInWithOidc,
   },
 ]
 

@@ -23,6 +23,7 @@ import { AuthProvider, authCookieHandler, authProviderCheck } from './helper';
 import { GoogleSSOGuard } from './guards/google-sso.guard';
 import { GithubSSOGuard } from './guards/github-sso.guard';
 import { MicrosoftSSOGuard } from './guards/microsoft-sso-.guard';
+import { OidcSSOGuard } from './guards/oidc.guard';
 import { ThrottlerBehindProxyGuard } from 'src/guards/throttler-behind-proxy.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AUTH_PROVIDER_NOT_SPECIFIED } from 'src/errors';
@@ -96,6 +97,31 @@ export class AuthController {
     );
     if (E.isLeft(newTokenPair)) throwHTTPErr(newTokenPair.left);
     authCookieHandler(res, newTokenPair.right, false, null);
+  }
+
+  /**
+   ** Route to initiate SSO auth via OIDC
+   */
+  @Get('oidc')
+  @UseGuards(OidcSSOGuard)
+  async oidcAuth(@Request() req) {}
+
+  /**
+   ** Callback URL for OIDC SSO
+   * @see https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow#how-it-works
+   */
+  @Get('oidc/callback')
+  @SkipThrottle()
+  @UseGuards(OidcSSOGuard)
+  async oidcAuthRedirect(@Request() req, @Res() res) {
+    const authTokens = await this.authService.generateAuthTokens(req.user.uid);
+    if (E.isLeft(authTokens)) throwHTTPErr(authTokens.left);
+    authCookieHandler(
+      res,
+      authTokens.right,
+      true,
+      req.authInfo.state.redirect_uri,
+    );
   }
 
   /**

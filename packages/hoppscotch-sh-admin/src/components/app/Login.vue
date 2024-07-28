@@ -51,6 +51,13 @@
           :label="t('state.continue_email')"
           @click="mode = 'email'"
         />
+        <HoppSmartItem
+          v-if="allowedAuthProviders.includes('OIDC')"
+          :loading="signingInWithOidc"
+          :icon="IconOidc"
+          :label="`${oidcButtonText || 'Continue with OIDC'}`"
+          @click="signInWithOidc"
+        />
       </div>
       <form
         v-if="mode === 'email' && allowedAuthProviders"
@@ -162,6 +169,7 @@ import IconGoogle from '~icons/auth/google';
 import IconMicrosoft from '~icons/auth/microsoft';
 import IconArrowLeft from '~icons/lucide/arrow-left';
 import IconFileText from '~icons/lucide/file-text';
+import IconOidc from '~icons/auth/oidc';
 
 const t = useI18n();
 const toast = useToast();
@@ -178,9 +186,11 @@ const signingInWithGoogle = ref(false);
 const signingInWithGitHub = ref(false);
 const signingInWithMicrosoft = ref(false);
 const signingInWithEmail = ref(false);
+const signingInWithOidc = ref(false);
 const mode = ref('sign-in');
 const nonAdminUser = ref(false);
 
+const oidcButtonText = import.meta.env.VITE_OIDC_TEXT;
 const allowedAuthProviders = ref<string[]>([]);
 
 onMounted(async () => {
@@ -232,7 +242,7 @@ const signInWithMicrosoft = () => {
 
 const signInWithEmail = async () => {
   signingInWithEmail.value = true;
-  try {
+try {
     await auth.signInWithEmail(form.value.email);
     mode.value = 'email-sent';
     setLocalConfig('emailForSignIn', form.value.email);
@@ -242,6 +252,17 @@ const signInWithEmail = async () => {
   }
   signingInWithEmail.value = false;
 };
+
+async function signInWithOidc() {
+  signingInWithOidc.value = true;
+  try {
+    await auth.signInUserWithOidc();
+  } catch (e) {
+    console.error(e);
+    toast.error(`Failed to sign in with OIDC`);
+  }
+  signingInWithOidc.value = false;
+}
 
 const getAllowedAuthProviders = async () => {
   fetching.value = true;

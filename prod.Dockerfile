@@ -1,5 +1,8 @@
 FROM node:20-alpine3.19 as base_builder
 
+ARG http_proxy="http://172.10.1.107:1105" \
+    https_proxy="http://172.10.1.107:1105"
+
 WORKDIR /usr/src/app
 
 ENV HOPP_ALLOW_RUNTIME_ENV=true
