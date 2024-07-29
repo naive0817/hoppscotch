@@ -63,7 +63,6 @@ export class InfraConfigService implements OnModuleInit {
   async initializeInfraConfigTable() {
     try {
       const propsToInsert = await getMissingInfraConfigEntries();
-
       if (propsToInsert.length > 0) {
         await this.prisma.infraConfig.createMany({ data: propsToInsert });
         stopApp();
@@ -195,6 +194,17 @@ export class InfraConfigService implements OnModuleInit {
           configMap.MICROSOFT_CALLBACK_URL &&
           configMap.MICROSOFT_SCOPE &&
           configMap.MICROSOFT_TENANT
+        );
+      case AuthProvider.OIDC:
+        return (
+          configMap.OIDC_CLIENT_ID &&
+          configMap.OIDC_CLIENT_SECRET &&
+          configMap.OIDC_CALLBACK_URL &&
+          configMap.OIDC_SCOPE &&
+          configMap.OIDC_ISSUER &&
+          configMap.OIDC_AUTH_URL &&
+          configMap.OIDC_TOKEN_URL &&
+          configMap.OIDC_USERINFO_URL
         );
       case AuthProvider.EMAIL:
         if (configMap.MAILER_SMTP_ENABLE !== 'true') return false;
@@ -341,7 +351,7 @@ export class InfraConfigService implements OnModuleInit {
    * @param checkDisallowedKeys If true, check if the names are allowed to fetch by client
    * @returns InfraConfig model
    */
-  async getMany(names: InfraConfigEnum[], checkDisallowedKeys: boolean = true) {
+  async getMany(names: InfraConfigEnum[], checkDisallowedKeys = true) {
     if (checkDisallowedKeys) {
       // Check if the names are allowed to fetch by client
       for (let i = 0; i < names.length; i++) {
@@ -517,6 +527,34 @@ export class InfraConfigService implements OnModuleInit {
           break;
         case InfraConfigEnum.MICROSOFT_TENANT:
           if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_CLIENT_ID:
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_CLIENT_SECRET:
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_ISSUER:
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_SCOPE:
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_CALLBACK_URL:
+          if (!validateUrl(infraConfigs[i].value))
+            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_AUTH_URL:
+          if (!validateUrl(infraConfigs[i].value))
+            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_TOKEN_URL:
+          if (!validateUrl(infraConfigs[i].value))
+            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnum.OIDC_USERINFO_URL:
+          if (!validateUrl(infraConfigs[i].value))
+            return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         default:
           break;

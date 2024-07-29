@@ -5,23 +5,25 @@ import * as O from 'fp-ts/Option';
 import { Profile, Strategy, VerifyCallback } from 'passport-openidconnect';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from '../auth.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OidcStrategy extends PassportStrategy(Strategy) {
   constructor(
     private usersService: UserService,
     private authService: AuthService,
+    private configService: ConfigService,
   ) {
     super({
-      issuer: process.env.OIDC_ISSUER,
-      authorizationURL: process.env.OIDC_AUTH_URL,
-      tokenURL: process.env.OIDC_TOKEN_URL,
-      userInfoURL: process.env.OIDC_USERINFO_URL,
-      clientID: process.env.OIDC_CLIENT_ID,
-      clientSecret: process.env.OIDC_CLIENT_SECRET,
-      callbackURL: process.env.OIDC_CALLBACK_URL,
-      scope: process.env.OIDC_SCOPE
-        ? process.env.OIDC_SCOPE.split(',')
+      issuer: configService.get('OIDC_ISSUER'),
+      authorizationURL: configService.get('OIDC_AUTH_URL'),
+      tokenURL: configService.get('OIDC_TOKEN_URL'),
+      userInfoURL: configService.get('OIDC_USERINFO_URL'),
+      clientID: configService.get('OIDC_CLIENT_ID'),
+      clientSecret: configService.get('OIDC_CLIENT_SECRET'),
+      callbackURL: configService.get('OIDC_CALLBACK_URL'),
+      scope: configService.get('OIDC_SCOPE')
+        ? configService.get('OIDC_SCOPE').split(',')
         : ['openid'],
     });
   }

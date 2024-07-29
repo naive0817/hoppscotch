@@ -25,6 +25,7 @@ import {
   GOOGLE_CONFIGS,
   MAIL_CONFIGS,
   MICROSOFT_CONFIGS,
+  OIDC_CONFIGS,
   ServerConfigs,
   UpdatedConfigs,
 } from '~/helpers/configs';
@@ -110,6 +111,16 @@ export function useConfigHandler(updatedConfigs?: ServerConfigs) {
             callback_url: getFieldValue(InfraConfigEnum.MicrosoftCallbackUrl),
             scope: getFieldValue(InfraConfigEnum.MicrosoftScope),
             tenant: getFieldValue(InfraConfigEnum.MicrosoftTenant),
+          },
+        },
+        oidc: {
+          name: 'oidc',
+          enabled: allowedAuthProviders.value.includes(AuthProvider.Oidc),
+          fields: {
+            client_id: getFieldValue(InfraConfigEnum.OidcClientId),
+            client_secret: getFieldValue(InfraConfigEnum.OidcClientSecret),
+            callback_url: getFieldValue(InfraConfigEnum.OidcCallbackUrl),
+            scope: getFieldValue(InfraConfigEnum.OidcScope)
           },
         },
       },
@@ -248,6 +259,11 @@ export function useConfigHandler(updatedConfigs?: ServerConfigs) {
         enabled: isCustomMailConfigEnabled,
         fields: customMailConfigFields,
       },
+      {
+        config: OIDC_CONFIGS,
+        enabled: updatedConfigs?.providers.oidc.enabled,
+        fields: updatedConfigs?.providers.oidc.fields,
+      }
     ];
 
     const transformedConfigs: UpdatedConfigs[] = [];
@@ -315,6 +331,12 @@ export function useConfigHandler(updatedConfigs?: ServerConfigs) {
       {
         provider: AuthProvider.Email,
         status: updatedConfigs?.mailConfigs.fields.email_auth
+          ? ServiceStatus.Enable
+          : ServiceStatus.Disable,
+      },
+      {
+        provider: AuthProvider.Oidc,
+        status: updatedConfigs?.providers.oidc.enabled
           ? ServiceStatus.Enable
           : ServiceStatus.Disable,
       },

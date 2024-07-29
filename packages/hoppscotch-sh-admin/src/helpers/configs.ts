@@ -1,6 +1,6 @@
 import { InfraConfigEnum } from './backend/graphql';
 
-export type SsoAuthProviders = 'google' | 'microsoft' | 'github';
+export type SsoAuthProviders = 'google' | 'microsoft' | 'github' | 'oidc';
 
 export type ServerConfigs = {
   providers: {
@@ -33,6 +33,16 @@ export type ServerConfigs = {
         callback_url: string;
         scope: string;
         tenant: string;
+      };
+    };
+    oidc: {
+      name: SsoAuthProviders;
+      enabled: boolean;
+      fields: {
+        callback_url: string;
+        client_id: string;
+        client_secret: string;
+        scope: string;
       };
     };
   };
@@ -143,6 +153,26 @@ export const GITHUB_CONFIGS: Config[] = [
   },
 ];
 
+export const OIDC_CONFIGS: Config[] = [
+  {
+    name: InfraConfigEnum.OidcCallbackUrl,
+    key: 'callback_url',
+  },
+  {
+    name: InfraConfigEnum.OidcClientId,
+    key: 'client_id',
+  },
+  {
+    name: InfraConfigEnum.OidcClientSecret,
+    key: 'client_secret',
+  },
+  {
+    name: InfraConfigEnum.OidcScope,
+    key: 'scope',
+  },
+];
+
+
 export const MAIL_CONFIGS: Config[] = [
   {
     name: InfraConfigEnum.MailerSmtpUrl,
@@ -199,6 +229,7 @@ export const ALL_CONFIGS = [
   GOOGLE_CONFIGS,
   MICROSOFT_CONFIGS,
   GITHUB_CONFIGS,
+  OIDC_CONFIGS,
   MAIL_CONFIGS,
   CUSTOM_MAIL_CONFIGS,
   DATA_SHARING_CONFIGS,
