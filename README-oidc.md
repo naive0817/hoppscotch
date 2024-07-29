@@ -30,3 +30,26 @@ OIDC_USERINFO_URL="https://your-gitlab/oauth/userinfo"
 2. 选择「OIDC 应用」，填写应用名称，配置`Redirect URI`为`https://your-hoppscotch-server/v1/auth/oidc/callback`，配置`Scopes`为`openid,profile,email`，点击「创建应用」。
 
 3. 创建成功后，点击「配置」，可以获取到 `Client ID` 和 `Client Secret`。
+
+#### using Gitlab-CE.
+
+In the .env file, provide the following configuration:
+
+```
+# OIDC Auth Config
+OIDC_CLIENT_ID="********"
+OIDC_CLIENT_SECRET="*********"
+OIDC_CALLBACK_URL=https://your-hoppscotch-server/v1/auth/oidc/callback
+OIDC_SCOPE="openid,profile,email"
+OIDC_ISSUER="https://your-gitlab"
+OIDC_AUTH_URL="https://your-gitlab/oauth/authorize"
+OIDC_TOKEN_URL="https://your-gitlab/oauth/token"
+OIDC_USERINFO_URL="https://your-gitlab/oauth/userinfo"
+```
+
+Obtaining OIDC_CLIENT_ID and OIDC_CLIENT_SECRET
+- Log in to the GitLab admin console.
+- Click on “Applications” and then “Create Application”.
+- Select “OIDC Application”, fill in the application name, set the Redirect URI to `https://your-hoppscotch-server/v1/auth/oidc/callback`, and configure the Scopes to `openid,profile,email`.
+- Click “Create Application”.
+- After creation, click “Configure” to obtain the Client ID and Client Secret.
